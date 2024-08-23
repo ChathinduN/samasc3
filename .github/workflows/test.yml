@@ -1,0 +1,51 @@
+name: Puppeteer Screenshot Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install Puppeteer
+      run: npm install
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install Python dependencies
+      run: pip install praw requests
+
+    - name: Run the Python script
+      run: python main.py
+
+    - name: Check for changes and commit
+      run: |
+        git config --global user.email "chathindun@gmail.com"
+        git config --global user.name "ChathinduN"
+        
+        # Add all changes
+        git add -A
+        
+        # Commit changes if there are any
+        if git diff-index --quiet HEAD; then
+          echo "No changes to commit."
+        else
+          git commit -m "Update imgBB URLs and processed submissions"
+          git push
+        fi
